@@ -9,6 +9,15 @@ services:
                 command: /bin/sh -c "mvn package -DskipTests && java -jar target/todo-0.0.1-SNAPSHOT.jar"
                 volumes:
                         - maven-repo:/root/.m2
+
+        postgres:
+                restart: always
+                image: postgres:10.4
+                ports:
+                        - "5432"
+                volumes:
+                        - pgdata:/var/lib/postgresql/data/
+
 volumes:
         maven-repo:
-
+        pgdata:
