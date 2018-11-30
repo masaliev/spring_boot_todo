@@ -23,6 +23,8 @@ services:
                 build: passport
                 ports:
                         - 8081:8081
+                links:
+                        - postgres:postgres
                 command: /bin/sh -c "mvn package -DskipTests && java -jar target/passport-0.0.1-SNAPSHOT.jar"
                 volumes:
                         - maven-repo:/root/.m2
