@@ -29,7 +29,10 @@ services:
                 volumes:
                         - maven-repo:/root/.m2
 
-
+        redis:
+                image: redis
+                ports:
+                        - "6379:6379"
 
 volumes:
         maven-repo:
