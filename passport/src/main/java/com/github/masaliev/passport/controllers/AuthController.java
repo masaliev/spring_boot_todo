@@ -1,9 +1,8 @@
 package com.github.masaliev.passport.controllers;
 
-import com.github.masaliev.passport.domain.Role;
 import com.github.masaliev.passport.domain.User;
 import com.github.masaliev.passport.repository.UserRepository;
-import java.security.Principal;
+import com.github.masaliev.passport.service.UserService;
 import java.util.Collections;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @RequestMapping("/me")
     public User me(@AuthenticationPrincipal User user) {
@@ -28,17 +27,13 @@ public class AuthController {
     @PostMapping("/sign-up")
     @ResponseBody
     public ResponseEntity<Map<String, String>> signUp(User user) {
-        User userFromDb = userRepository.findByUsername(user.getUsername());
-        if (userFromDb != null) {
+        String errorString = userService.addUser(user);
+        if (errorString != null) {
             return ResponseEntity
                     .badRequest()
-                    .body(Collections.singletonMap("error", "User exists!"));
+                    .body(Collections.singletonMap("error", errorString));
+        } else {
+            return ResponseEntity.ok(Collections.singletonMap("user", "test2"));
         }
-        user.setActive(true); //@TODO send email to activate
-        user.setRoles(Collections.singleton(Role.USER));
-
-        userRepository.save(user);
-
-        return ResponseEntity.ok(Collections.singletonMap("user", "test2"));
     }
 }
