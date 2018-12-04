@@ -5,6 +5,7 @@ import com.github.masaliev.passport.domain.dto.SignInResult;
 import com.github.masaliev.passport.domain.dto.SignUpRequest;
 import com.github.masaliev.passport.exceptions.ValidationException;
 import com.github.masaliev.passport.service.UserService;
+import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -32,7 +33,7 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
 
     @RequestMapping("/me")
-    public User me(@AuthenticationPrincipal User user) {
+    public Principal me(@AuthenticationPrincipal Principal user) {
         return user; //@TODO remove pasword, etc fields from serialization or add new dto class
     }
 

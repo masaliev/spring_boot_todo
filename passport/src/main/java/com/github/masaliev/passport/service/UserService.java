@@ -1,22 +1,17 @@
 package com.github.masaliev.passport.service;
 
-import com.github.masaliev.passport.domain.Role;
 import com.github.masaliev.passport.domain.User;
 import com.github.masaliev.passport.domain.dto.SignUpRequest;
 import com.github.masaliev.passport.exceptions.DuplicateUsernameException;
 import com.github.masaliev.passport.repository.UserRepository;
+import com.github.masaliev.shared.UserRole;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -24,8 +19,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public User loadUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
@@ -45,15 +39,11 @@ public class UserService implements UserDetailsService {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setActive(true); //@TODO send email to activate
-        user.setRoles(Collections.singleton(Role.USER));
+        user.setRoles(Collections.singleton(UserRole.USER));
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         userRepository.save(user);
         return user;
     }
 
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
-        return new BCryptPasswordEncoder(8);
-    }
 }

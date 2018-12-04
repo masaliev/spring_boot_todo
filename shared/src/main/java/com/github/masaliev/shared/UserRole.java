@@ -1,8 +1,8 @@
-package com.github.masaliev.passport.domain;
+package com.github.masaliev.shared;
 
 import org.springframework.security.core.GrantedAuthority;
 
-public enum Role implements GrantedAuthority{
+public enum UserRole implements GrantedAuthority{
     USER, ADMIN;
 
     @Override
