@@ -2,7 +2,7 @@ version: '3'
 
 services:
         backend:
-                restart: always
+                #restart: always
                 build: backend
                 ports:
                         - 8080:8080
@@ -15,7 +15,7 @@ services:
                         - shared
 
         postgres:
-                restart: always
+                #restart: always
                 image: postgres:10.4
                 ports:
                         - 5433:5432
@@ -23,7 +23,7 @@ services:
                         - pgdata:/var/lib/postgresql/data/
 
         passport:
-                restart: always
+                #restart: always
                 build: passport
                 ports:
                         - 8081:8081
