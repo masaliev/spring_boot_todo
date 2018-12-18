@@ -56,10 +56,19 @@ services:
                         - 8082:8082
                 volumes:
                         - maven-repo:/root/.m2
+                        - ./dist:/usr/src/app/src/main/resources/static/js
                 depends_on:
                         - backend
                         - passport
+        frontend:
+                build: frontend
+                command: /bin/sh -c "yarn install && yarn build"
+                volumes:
+                        - node_modules:/usr/src/app/node_modules
+                        - ./dist:/usr/src/app/dist
+
 
 volumes:
         maven-repo:
         pgdata:
+        node_modules:

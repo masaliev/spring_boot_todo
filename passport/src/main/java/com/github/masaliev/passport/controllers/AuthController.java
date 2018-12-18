@@ -1,6 +1,7 @@
 package com.github.masaliev.passport.controllers;
 
 import com.github.masaliev.passport.domain.User;
+import com.github.masaliev.passport.domain.dto.SignInRequest;
 import com.github.masaliev.passport.domain.dto.SignInResult;
 import com.github.masaliev.passport.domain.dto.SignUpRequest;
 import com.github.masaliev.passport.exceptions.ValidationException;
@@ -19,8 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,10 +37,10 @@ public class AuthController {
     public Principal me(@AuthenticationPrincipal Principal user) {
         return user; //@TODO remove pasword, etc fields from serialization or add new dto class
     }
-
+    
     @PostMapping("/sign-in")
-    public SignInResult signIn(@RequestParam String username, @RequestParam String password, HttpServletRequest request) {
-        return handleSignIn(username, password, request);
+    public SignInResult signIn(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
+        return handleSignIn(signInRequest.getUsername(), signInRequest.getPassword(), request);
     }
 
     @PostMapping("/sign-up")
