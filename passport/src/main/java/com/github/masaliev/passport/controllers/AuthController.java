@@ -19,6 +19,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,16 +39,21 @@ public class AuthController {
     public Principal me(@AuthenticationPrincipal Principal user) {
         return user; //@TODO remove pasword, etc fields from serialization or add new dto class
     }
-    
+
     @PostMapping("/sign-in")
     public SignInResult signIn(@RequestBody SignInRequest signInRequest, HttpServletRequest request) {
         return handleSignIn(signInRequest.getUsername(), signInRequest.getPassword(), request);
     }
 
     @PostMapping("/sign-up")
-    public SignInResult signUp(@Valid SignUpRequest signUpRequest,
+    public SignInResult signUp(@RequestBody @Valid SignUpRequest signUpRequest,
             BindingResult bindingResult,
             HttpServletRequest request) {
+                
+        if (signUpRequest.getPassword() != null && !signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
+            bindingResult.addError(new FieldError("signUpRequest", "confirm_password", "Those passwords didn't match"));
+        }
+        
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }

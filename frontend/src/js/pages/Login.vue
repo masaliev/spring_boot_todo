@@ -14,6 +14,7 @@
                 </v-form>
               </v-card-text>
               <v-card-actions>
+                <v-btn color="primary" to="/registration" append flat>Sign Up</v-btn>
                 <v-spacer></v-spacer>
                 <v-btn color="primary" @click="login">Login</v-btn>
               </v-card-actions>

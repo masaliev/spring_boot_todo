@@ -60,6 +60,7 @@ services:
                 depends_on:
                         - backend
                         - passport
+                        - frontend
         frontend:
                 build: frontend
                 command: /bin/sh -c "yarn install && yarn build"

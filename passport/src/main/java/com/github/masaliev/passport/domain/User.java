@@ -17,13 +17,15 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "account_user")
-public class User implements Serializable{
+public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     private String username;
+
+    private String email;
 
     private String password;
 
@@ -48,6 +50,14 @@ public class User implements Serializable{
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

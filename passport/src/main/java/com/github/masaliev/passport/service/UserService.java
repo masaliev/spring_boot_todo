@@ -38,6 +38,7 @@ public class UserService {
         }
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
+        user.setEmail(signUpRequest.getEmail());
         user.setActive(true); //@TODO send email to activate
         user.setRoles(Collections.singleton(UserRole.USER));
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
