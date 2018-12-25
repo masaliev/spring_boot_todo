@@ -66,6 +66,15 @@
             watch: {
                 username () {
                     this.errorMessages.username = []
+                },
+                email() {
+                    this.errorMessages.email = []
+                },
+                password() {
+                    this.errorMessages.password = []
+                },
+                confirm_password() {
+                    this.errorMessages.confirm_password = []
                 }
             },
             methods: {
@@ -79,9 +88,12 @@
                         console.log(this.password);
                     this.$http.post('auth/sign-up', {username: this.username, password: this.password}).then(response => {
                         response.json().then(data => {
-                            this.$store.commit('account/setToken', data.token)
+                            if(data.status === 'success'){
+                                this.$router.push('activate/')
+                            }
+                            /*this.$store.commit('account/setToken', data.token)
                             this.$store.commit('account/setUsername', data.username)
-                            this.$router.replace('/')
+                            this.$router.replace('/')*/
                         })
                     }, response => {
                         if (response.ok === false && response.status === 400){
@@ -96,9 +108,9 @@
                         }
 
                     })
-                    }
                 }
             }
+	}
 	}
 </script>
 

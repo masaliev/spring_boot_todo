@@ -68,6 +68,36 @@ services:
                         - node_modules:/usr/src/app/node_modules
                         - ./dist:/usr/src/app/dist
 
+        zookeper:
+                image: wurstmeister/zookeeper
+                ports:
+                        - 2181:2181
+        kafka:
+                image: wurstmeister/kafka
+                ports:
+                        - 9092:9092
+                environment:
+                        #                        HOSTNAME_COMMAND: "route -n | awk '/UG[ \t]/{print $$2}'"
+                        #                        KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+                        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+                        KAFKA_LISTENERS: PLAINTEXT://kafka:9092
+                        KAFKA_ZOOKEEPER_CONNECT: zookeper:2181
+                        KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+                volumes:
+                        - /var/run/docker.sock:/var/run/docker.sock
+                depends_on:
+                        - zookeper
+                          
+        worker:
+                build: worker
+                command: /bin/sh -c "mvn package -DskipTests && java -jar target/worker-0.0.1-SNAPSHOT.jar"
+                links:
+                        - kafka:kafka
+                volumes:
+                        - maven-repo:/root/.m2
+                depends_on:
+                        - kafka
+
 
 volumes:
         maven-repo:

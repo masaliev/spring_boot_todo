@@ -6,6 +6,7 @@ import com.github.masaliev.passport.exceptions.DuplicateUsernameException;
 import com.github.masaliev.passport.repository.UserRepository;
 import com.github.masaliev.shared.UserRole;
 import java.util.Collections;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,9 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private MailSender mailSender;
 
     public User loadUserByUsername(String username) {
         return userRepository.findByUsername(username);
@@ -39,12 +43,33 @@ public class UserService {
         User user = new User();
         user.setUsername(signUpRequest.getUsername());
         user.setEmail(signUpRequest.getEmail());
-        user.setActive(true); //@TODO send email to activate
+        user.setActive(false);
+        user.setActivationCode(UUID.randomUUID().toString());
         user.setRoles(Collections.singleton(UserRole.USER));
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         userRepository.save(user);
+        
+        String message = String.format(
+                "Hello, %s \n\n" + 
+                        "Please, visit next link to activate your account: http://localhost:8082/auth/activate/%s", //@TODO make link configurable
+                user.getUsername(), user.getActivationCode());
+        mailSender.sendMail(user.getEmail(), "Activation code", message);
+        
         return user;
     }
 
+    public boolean activateUser(String code){
+        
+        User user = userRepository.findByActivationCode(code);
+        if (user == null){
+            return false;
+        }
+        
+        user.setActive(true);
+        user.setActivationCode(null);
+        userRepository.save(user);
+        
+        return true;
+    }
 }

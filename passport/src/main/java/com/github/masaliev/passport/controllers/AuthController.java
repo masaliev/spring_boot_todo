@@ -6,8 +6,12 @@ import com.github.masaliev.passport.domain.dto.SignInResult;
 import com.github.masaliev.passport.domain.dto.SignUpRequest;
 import com.github.masaliev.passport.exceptions.ValidationException;
 import com.github.masaliev.passport.service.UserService;
+import java.io.IOException;
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +24,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,20 +51,19 @@ public class AuthController {
     }
 
     @PostMapping("/sign-up")
-    public SignInResult signUp(@RequestBody @Valid SignUpRequest signUpRequest,
-            BindingResult bindingResult,
-            HttpServletRequest request) {
-                
+    public Map<String, String> signUp(@RequestBody @Valid SignUpRequest signUpRequest,
+            BindingResult bindingResult) {
+
         if (signUpRequest.getPassword() != null && !signUpRequest.getPassword().equals(signUpRequest.getConfirmPassword())) {
             bindingResult.addError(new FieldError("signUpRequest", "confirm_password", "Those passwords didn't match"));
         }
-        
+
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
         User user = userService.addUser(signUpRequest);
 
-        return handleSignIn(user.getUsername(), signUpRequest.getPassword(), request);
+        return Collections.singletonMap("status", "success");
     }
 
     private SignInResult handleSignIn(String username, String password, HttpServletRequest request) {
@@ -85,5 +89,17 @@ public class AuthController {
     public ResponseEntity signout(HttpServletRequest request) {
         request.getSession().invalidate();
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/activate/{code}")
+    public void activate(HttpServletResponse responce, @PathVariable String code) throws IOException {
+
+        boolean isActivated = userService.activateUser(code);
+
+        if (isActivated) {
+            responce.sendRedirect("http://localhost:8082/#/activate/success");
+        } else {
+            responce.sendRedirect("http://localhost:8082/#/activate/error");
+        }
     }
 }
